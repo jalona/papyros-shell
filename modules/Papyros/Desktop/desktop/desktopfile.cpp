@@ -23,6 +23,7 @@
 #include "desktopfiles.h"
 
 #include <QFile>
+#include <QDir>
 #include <QFileInfo>
 #include <QTextStream>
 #include <QLocale>
@@ -56,28 +57,35 @@ QString DesktopFile::getEnvVar(int pid)
 
 void DesktopFile::setAppId(QString appId)
 {
+    appId = canonicalAppId(appId);
+    setPath(appId + ".desktop");
+}
+
+QString DesktopFile::canonicalAppId(QString appId)
+{
     bool notFound = pathFromAppId(appId).isEmpty();
 
     if (notFound && appId.startsWith("papyros-")) {
         QString name = appId.mid(8);
 
         if (name == "appcenter") {
-            name == "AppCenter";
-        }
-        else {
+            name = "AppCenter";
+        } else {
             name = name.left(1).toUpper() + name.mid(1);
         }
 
         appId = "io.papyros." + name;
+
+        qDebug() << appId;
     }
 
-    setPath(appId + ".desktop");
+    return appId;
 }
 
 QString DesktopFile::pathFromAppId(QString appId)
 {
     QStringList paths;
-    paths << "~/.local/share/applications"
+    paths << QDir::homePath() + "/.local/share/applications"
           << "/usr/local/share/applications"
           << "/usr/share/applications";
 
@@ -122,30 +130,15 @@ bool DesktopFile::launch(const QStringList &urls) const
     return DesktopFiles::sharedInstance()->launchApplication(m_appId, urls);
 }
 
-QString DesktopFile::name() const
-{
-    return m_desktopFile ? m_desktopFile->name() : "";
-}
+QString DesktopFile::name() const { return m_desktopFile ? m_desktopFile->name() : ""; }
 
-QString DesktopFile::iconName() const
-{
-    return m_desktopFile ? m_desktopFile->iconName() : "";
-}
+QString DesktopFile::iconName() const { return m_desktopFile ? m_desktopFile->iconName() : ""; }
 
-bool DesktopFile::hasIcon() const
-{
-    return !QIcon::fromTheme(iconName()).isNull();
-}
+bool DesktopFile::hasIcon() const { return !QIcon::fromTheme(iconName()).isNull(); }
 
-QString DesktopFile::comment() const
-{
-    return m_desktopFile ? m_desktopFile->comment() : "";
-}
+QString DesktopFile::comment() const { return m_desktopFile ? m_desktopFile->comment() : ""; }
 
-bool DesktopFile::isValid() const
-{
-    return m_desktopFile ? m_desktopFile->isValid() : false;
-}
+bool DesktopFile::isValid() const { return m_desktopFile ? m_desktopFile->isValid() : false; }
 
 bool DesktopFile::isShown(const QString &environment) const
 {

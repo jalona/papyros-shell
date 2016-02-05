@@ -46,7 +46,7 @@ public:
 
     static QString getEnvVar(int pid);
 
-    Q_INVOKABLE bool launch(const QStringList& urls) const;
+    Q_INVOKABLE bool launch(const QStringList &urls) const;
 
     QString m_appId;
     QString m_path;
@@ -58,6 +58,8 @@ public:
     QString comment() const;
     bool isValid() const;
     bool isShown(const QString &environment = QString()) const;
+
+    static QString canonicalAppId(QString appId);
 
 public slots:
     void setAppId(QString appId);
@@ -71,9 +73,9 @@ signals:
     void appIdChanged();
 
 private:
-    QString pathFromAppId(QString appId);
-    QString findFileInPaths(QString fileName, QStringList paths);
-    QVariant localizedValue(const QSettings &desktopFile, QString key);
+    static QString pathFromAppId(QString appId);
+    static QString findFileInPaths(QString fileName, QStringList paths);
+    static QVariant localizedValue(const QSettings &desktopFile, QString key);
 
     XdgDesktopFile *m_desktopFile;
 };
